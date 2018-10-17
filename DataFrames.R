@@ -14,4 +14,9 @@ df$days #return a vector format
 df['days'] #return a data frame format
 
 condition<- rain==T
+tempCondition<- temp>80
 subset(df,subset = condition)
+subset(df,subset = tempCondition)
+
+sortedTemp<- order(df$temp)
+df[sortedTemp,]
