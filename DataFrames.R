@@ -20,3 +20,5 @@ subset(df,subset = tempCondition)
 
 sortedTemp<- order(df$temp)
 df[sortedTemp,]
+
+any(is.na(df))
