@@ -53,3 +53,35 @@ summary(model)
 res<- residuals(model)
 res<- as.data.frame(res)
 ggplot(res,aes(res))+geom_histogram(fill="blue",alpha=0.5)
+
+#PREDICTIONS
+g3.predictions<- predict(model,test)
+
+results<- cbind(g3.predictions, test$G3)
+colnames(results)<- c('predicted','actual')
+results<- as.data.frame(results)
+results
+
+#taking care of negative predictions
+
+to_zero<- function(x){
+  if(x<0){
+    return(0)
+  }else{
+    return(x)
+  }
+}
+
+#apply zero function
+results$predicted<- sapply(results$predicted,to_zero)
+min(results$predicted)
+
+#evaluate the prediction
+mse<- mean((results$actual - results$predicted)^2)
+
+rmse<- mse^0.5
+
+### R SQUARED
+SSE<- sum((results$actual - results$predicted)^2)
+SST<- sum((mean(student.mat$G3) - results$actual)^2)
+Rsquared<- 1- SSE/SST
