@@ -2,6 +2,9 @@ library(ISLR)
 library(ggplot2)
 library(plotly)
 library(caTools)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
 
 head(College)
 
@@ -30,3 +33,41 @@ ggplot(data=df,aes(Grad.Rate))+
 ggplotly()
 
 #Train and test split
+set.seed(101)
+sample<- sample.split(df$Private, SplitRatio = 0.7)
+
+train.data<- subset(df,sample==T)
+test.data<- subset(df,sample==F)
+
+#building decision tree
+tree<- rpart(Private ~.,method = "class",data = train.data)
+
+predictedPrivate<- predict(tree,test.data)
+head(predictedPrivate)
+
+predictedPrivate<- as.data.frame(predictedPrivate)
+joinColumns<- function(column){
+  if(column>0.5){
+    return("Yes")
+  }else{
+    return("No")
+  }
+}
+
+predictedPrivate$Private<- sapply(predictedPrivate$Yes,joinColumns)
+
+#confusion matrix
+table(test.data$Private,predictedPrivate$Private)
+
+prp(tree)
+
+#random Forest
+randomForestPrivate<- randomForest(Private ~.,data = train.data,importance=T)
+
+#confusion matrix
+randomForestPrivate$confusion
+randomForestPrivate$importance
+
+#predict
+rfPredicted<- predict(randomForestPrivate,test.data)
+table(rfPredicted,test.data$Private)
